@@ -1,6 +1,8 @@
 #!/bin/bash
-rm -vR deforestation_toy
 
+wget "https://storage.googleapis.com/nextgenmap-dataset/dl-time-series/deforestation_toy.zip"
+
+rm -vR deforestation_toy
 unzip deforestation_toy.zip
 
 echo "Executing tack_imgs.py"
