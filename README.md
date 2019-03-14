@@ -6,7 +6,7 @@ Deep-learning applied to time series classification of remote sensing data.
 Download the Deforestation toy data in https://storage.googleapis.com/nextgenmap-dataset/dl-time-series/deforestation_toy.zip and follow the instructions below:
 1. Stack all the images inside deforestation_toy/images to produce a image time-series, organized per band.
 ```sh
-$ ./stack_imgs.py -i deforestation_toy/images -b 1 2 3 4 -o deforestation_toy/image_series
+$ ./generate_img_series.py -i deforestation_toy/images -b 1 2 3 4 -o deforestation_toy/image_series
 ```
 2. Generate the time-series data (e.i. numpy arrays) considering the samples:
 ```sh
@@ -22,13 +22,13 @@ $ tensorboard --logdir=deforestation_toy/model/log
 ```
 4. Classify the image time-series using the last epoch model:
 ```sh
-$ ../classify_imgs.py -i deforestation_toy/image_series/ -m deforestation_toy/model/last_model.H5 -o deforestation_toy/classification/result.img
+$ ../classify_img_series.py -i deforestation_toy/image_series/ -m deforestation_toy/model/last_model.H5 -o deforestation_toy/classification/result.img
 ```
 * Check the classification result, deforestation_toy/classification/result.img, in [QGIS](https://www.qgis.org):
 ## Usages
-**stack_imgs.py**
+**generate_img_series.py**
 ```sh
-usage: stack_imgs.py [-h] -i INPUT_DIR [-b BANDS [BANDS ...]] -o OUTPUT_DIR
+usage: generate_img_series.py [-h] -i INPUT_DIR [-b BANDS [BANDS ...]] -o OUTPUT_DIR
 
 STEP 01/04 - Stack all images of input directory, producing one Virtual
 Dataset-VRT per band in output directory
@@ -102,9 +102,9 @@ optional arguments:
                         trained model and the tensorboard logs
 
 ```
-**classify_imgs.py**
+**classify_img_series.py**
 ```sh
-usage: classify_imgs.py [-h] -i INPUT_DIR -m MODEL -o OUTPUT
+usage: classify_img_series.py [-h] -i INPUT_DIR -m MODEL -o OUTPUT
 
 04/04 - Classify image series using a trained model.
 
