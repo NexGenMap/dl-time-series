@@ -87,6 +87,8 @@ def get_filenames(input_dir, filter_prefix='', filter_suffix=''):
 			 filename.endswith(filter_suffix):
 			result.append(os.path.join(input_dir, filename))
 
+	result.sort()
+
 	return result
 
 def all_images_are_consistent(images):
