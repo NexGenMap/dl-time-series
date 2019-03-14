@@ -1,6 +1,7 @@
 # dl-time-series
 
-Deep-learning applied to time series classification of remote sensing data.
+Deep-learning applied to time series classification of remote sensing data, according to this workflow:
+![alt tag](https://raw.githubusercontent.com/NexGenMap/dl-time-series/master/docs/workflow.png)
 
 ## Workflow Execution (Deforestation toy data)
 Download the Deforestation toy data in https://storage.googleapis.com/nextgenmap-dataset/dl-time-series/deforestation_toy.zip and follow the instructions below:
