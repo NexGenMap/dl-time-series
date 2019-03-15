@@ -1,5 +1,5 @@
 import os
-import gdal
+from osgeo import gdal
 import ntpath
 import pickle
 
