@@ -2,7 +2,7 @@
 
 import os
 import ntpath
-import gdal
+from osgeo import gdal
 import argparse
 import ts_utils
 
