@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 
 import numpy as np
-import gdal
+from osgeo import gdal
 import argparse
 import ts_utils
-import gdal
-import ogr
+from osgeo import ogr
 
 from keras.utils import to_categorical
 
