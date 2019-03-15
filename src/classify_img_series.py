@@ -6,7 +6,7 @@ import ntpath
 from osgeo import gdal
 import argparse
 import ts_utils
-frfom osgeo import ogr
+from osgeo import ogr
 
 from sklearn.model_selection import train_test_split
 
