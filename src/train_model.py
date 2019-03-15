@@ -3,11 +3,10 @@
 import numpy as np
 import os
 import ntpath
-import gdal
+from osgeo import gdal
 import argparse
 import ts_utils
-import gdal
-import ogr
+from osgeo import ogr
 
 from sklearn.model_selection import train_test_split
 
