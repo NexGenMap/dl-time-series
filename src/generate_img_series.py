@@ -62,7 +62,7 @@ def create_vrt_output(input_imgs, output_vrt, bands = None):
 
 def exec(input_dir, output_dir, bands = None):
 	ts_utils.mkdirp(output_dir)
-	images = ts_utils.get_filenames(input_dir, filter_suffix='.tif')
+	images = ts_utils.get_filenames(input_dir, filter_suffix='.vrt')
 
 	if bands is None:
 		nbands = ts_utils.get_nbands(images[0])

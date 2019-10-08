@@ -39,7 +39,7 @@ def exec(input_dir, series_dir, samples_file, num_classes, column_label = 'class
 	
 	print("Reading data from", img_files)
 	for feature in features:
-		label = feature.GetField('class')
+		label = feature.GetField(column_label)
 		
 		point = feature.GetGeometryRef()
 		coord_x, coord_y = point.GetX(),point.GetY()
@@ -51,16 +51,27 @@ def exec(input_dir, series_dir, samples_file, num_classes, column_label = 'class
 		feature_label = to_categorical(label, num_classes)
 		
 		for ds_image in ds_images:			
-			tseries = ds_image.ReadAsArray(xoff=xoff, yoff=yoff, xsize=1, ysize=1)
+			tseries = ds_image.ReadAsArray(xoff=xoff-1, yoff=yoff-1, xsize=3, ysize=3)
 			nbands, _, _ = tseries.shape
 			
-			feature_input.append(tseries.reshape((1, nbands)))
+			#feature_input.append(tseries.reshape((1, nbands)))
+			feature_input.append(tseries)
 
-		ts_input.append(np.vstack(feature_input))
+		#ts_input.append(np.vstack(feature_input))
+		ts_input.append(np.stack(feature_input))
 		ts_label.append(feature_label)
-
-	ts_input = np.dstack(ts_input).transpose((2,1,0))
+		
+	ts_input = np.stack(ts_input).transpose((0,4,3,2,1))
 	ts_label = np.stack(ts_label)
+
+	nsamples, _, = ts_label.shape
+
+	rand_idxs = np.random.choice(nsamples, nsamples)
+	print("Shuffling series...")
+	for i1 in range(nsamples):
+		i2 = rand_idxs[i1]
+		ts_input[i2,:,:,:], ts_input[i1,:,:,:] = ts_input[i1,:,:,:], ts_input[i2,:,:,:]
+		ts_label[i2,:], ts_label[i1,:] = ts_label[i1,:], ts_label[i2,:]
 
 	print('Time-series input shape:', ts_input.shape)
 	print('Time-series label shape:', ts_label.shape)

@@ -18,8 +18,37 @@ from keras.models import load_model
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import TensorBoard
 
+from keras.callbacks import Callback
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
+
 from ts_models import lstm
 
+class Metrics(Callback):
+	
+	def on_train_begin(self, logs={}):
+	 self.val_f1s = []
+	 self.val_recalls = []
+	 self.val_precisions = []
+	 self.val_conf_matrix = []
+	 
+	def on_epoch_end(self, epoch, logs={}):
+	 
+	 val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round().argmax(axis=1)
+	 val_targ = self.validation_data[1].argmax(axis=1)
+
+	 _val_f1 = f1_score(val_targ, val_predict, labels=[0,1], pos_label=1, average='binary')
+	 _val_recall = recall_score(val_targ, val_predict, labels=[0,1], pos_label=1, average='binary')
+	 _val_precision = precision_score(val_targ, val_predict, labels=[0,1], pos_label=1, average='binary')
+	 _val_conf_matrix = confusion_matrix(val_targ, val_predict)
+
+	 self.val_f1s.append(_val_f1)
+	 self.val_recalls.append(_val_recall)
+	 self.val_precisions.append(_val_precision)
+	 
+	 print(_val_conf_matrix)
+	 
+	 return
+ 
 def parse_args():
 	parser = argparse.ArgumentParser(description='STEP 03/04 - LSTM training approach using several time-series')
 	parser.add_argument("-i", "--series-dir", help='<Required> Input directory that contains the VRT images.', \
@@ -66,8 +95,12 @@ def exec(series_dir, output_dir, epochs = 100, batch_size = 15, learning_rate = 
 	
 	ts_input, ts_label, ts_info = ts_utils.load_ts_data(series_dir)
 
-	ts_input_train, ts_input_test, ts_label_train, ts_label_test = train_test_split(ts_input, ts_label, 
-		train_size=(1-test_split), shuffle=True, random_state=seed)
+	if (test_split > 0 and test_split <= 1):
+		ts_input_train, ts_input_test, ts_label_train, ts_label_test = train_test_split(ts_input, ts_label, 
+			train_size=(1-test_split), shuffle=True, random_state=seed)
+	else:
+		ts_input_train = ts_input
+		ts_label_train = ts_label
 
 	acc_model_filepath = os.path.join(output_dir, 'acc_model.H5')
 	loss_model_filepath = os.path.join(output_dir, 'loss_model.H5')
@@ -77,25 +110,26 @@ def exec(series_dir, output_dir, epochs = 100, batch_size = 15, learning_rate = 
 		set_seed(seed)
 
 		model = lstm.new_instance(ts_info['input_shape'][1:], learning_rate);
-		print(model.summary())
+		#print(model.summary())
 		
-
 		log_dir = os.path.join(output_dir, 'log')
 
 		callbacks = [
 			ModelCheckpoint(last_model_filepath, save_best_only=False),
 			ModelCheckpoint(acc_model_filepath, monitor='val_acc', save_best_only=True),
 			ModelCheckpoint(loss_model_filepath, monitor='val_loss', save_best_only=True),
-			TensorBoard(log_dir=log_dir, write_grads=True, write_images=False)
+			TensorBoard(log_dir=log_dir, write_grads=True, write_images=False),
+			Metrics()
 		]
 		
 		model.fit(ts_input_train, ts_label_train, epochs=epochs, batch_size=batch_size, 
 			shuffle=True, validation_split=validation_split, callbacks=callbacks
 		)
 
-	evaluate(last_model_filepath, ts_input_test, ts_label_test, 'LAST MODEL (test)')
-	evaluate(acc_model_filepath, ts_input_test, ts_label_test, 'BEST ACC.MODEL (test)')
-	evaluate(loss_model_filepath, ts_input_test, ts_label_test, 'BEST LOSS.MODEL (test)')
+	if (test_split > 0 and test_split <= 1):
+		evaluate(last_model_filepath, ts_input_test, ts_label_test, 'LAST MODEL (test)')
+		evaluate(acc_model_filepath, ts_input_test, ts_label_test, 'BEST ACC.MODEL (test)')
+		evaluate(loss_model_filepath, ts_input_test, ts_label_test, 'BEST LOSS.MODEL (test)')
 
 if __name__ == "__main__":
 	args = parse_args()
